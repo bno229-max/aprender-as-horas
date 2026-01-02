@@ -8,258 +8,268 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --hour-color: #2563eb; /* Azul */
-            --min-color: #db2777;  /* Rosa */
-            --primary: #6366f1;
-            --success: #22c55e;
-            --bg: #f8fafc;
+            --hour-color: #3b82f6; /* Azul */
+            --min-color: #f43f5e;  /* Rosa */
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #fef2f2 100%);
         }
 
         body {
             font-family: 'Fredoka', sans-serif;
-            background-color: var(--bg);
+            background: var(--bg-gradient);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
+            padding: 10px;
             user-select: none;
         }
 
-        .container {
-            background: white;
-            padding: 1.5rem;
+        .main-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
             border-radius: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
             text-align: center;
-            width: 350px;
-            border: 4px solid transparent;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid rgba(255,255,255,0.6);
         }
 
-        h1 { color: var(--primary); margin: 0 0 10px 0; font-size: 1.6rem; }
+        h1 { color: #1e293b; margin: 0 0 15px 0; font-size: 1.6rem; }
 
-        /* Legenda Colorida */
-        .info-bar {
-            background: #f1f5f9;
+        /* Cards de Legenda Simplificados */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sq-card {
             padding: 10px;
             border-radius: 15px;
-            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 0.7rem;
             display: flex;
-            flex-direction: column;
-            gap: 5px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            line-height: 1.2;
         }
-        .info-h { color: var(--hour-color); }
-        .info-m { color: var(--min-color); }
 
-        .target-box {
-            background: #fdf2f8;
+        .sq-h { background: #eff6ff; color: var(--hour-color); }
+        .sq-m { background: #fff1f2; color: var(--min-color); }
+
+        .challenge-card {
+            background: white;
             border-radius: 20px;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
         }
-        .target-label { font-size: 0.9rem; color: #64748b; font-weight: 600; }
-        .target-time { font-size: 2.5rem; font-weight: 700; color: var(--primary); }
 
-        .clock {
-            width: 260px; height: 260px;
-            border-radius: 50%;
-            background: #fff;
-            border: 10px solid #e2e8f0;
+        .label { color: #64748b; font-size: 0.85rem; font-weight: 600; }
+        .time-display { font-size: 2.8rem; font-weight: 700; color: #1e293b; line-height: 1; }
+
+        .clock-face {
             position: relative;
-            margin: 0 auto;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto 20px;
+            background: #ffffff;
+            border-radius: 50%;
+            border: 10px solid #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             touch-action: none;
         }
 
         .number {
             position: absolute; width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 1.3rem; color: #1e293b;
+            font-weight: 600; font-size: 1.4rem; color: #334155;
+            pointer-events: none; z-index: 1;
         }
 
         .min-help {
-            position: absolute; font-size: 0.8rem; color: var(--min-color);
-            font-weight: 700; opacity: 0; transition: 0.3s;
+            position: absolute; font-size: 0.85rem; color: var(--min-color);
+            font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none;
         }
         .show-help .min-help { opacity: 1; }
 
         .hand {
             position: absolute; bottom: 50%; left: 50%;
-            transform-origin: bottom center; border-radius: 10px;
+            transform-origin: bottom center; border-radius: 20px;
             cursor: pointer;
         }
-        /* Ponteiro Pequeno Azul */
-        .hour-hand { width: 10px; height: 65px; background: var(--hour-color); z-index: 3; }
-        /* Ponteiro Grande Rosa */
-        .min-hand { width: 6px; height: 95px; background: var(--min-color); z-index: 2; }
+        
+        .hour-hand { width: 14px; height: 65px; background: var(--hour-color); z-index: 50; }
+        .min-hand { width: 8px; height: 100px; background: var(--min-color); z-index: 40; }
 
-        .center {
-            position: absolute; top: 50%; left: 50%; width: 16px; height: 16px;
-            background: #334155; border-radius: 50%; transform: translate(-50%, -50%);
-            z-index: 10; border: 2px solid white;
+        .center-pin {
+            position: absolute; top: 50%; left: 50%; width: 18px; height: 18px;
+            background: #1e293b; border-radius: 50%; transform: translate(-50%, -50%);
+            z-index: 100; border: 3px solid white;
         }
 
-        .controls { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-
-        button {
-            border: none; border-radius: 15px; font-weight: 700; cursor: pointer;
-            font-family: 'Fredoka', sans-serif; transition: 0.2s;
+        /* Botão Verificar Resposta Ajustado */
+        .btn-verify {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 18px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #16a34a;
+            width: fit-content; /* Tamanho ajustado ao texto */
+            align-self: center;
+            margin: 0 auto 10px;
+            display: block;
+            transition: all 0.2s ease;
+            font-family: 'Fredoka', sans-serif;
         }
 
-        .btn-check {
-            background: var(--success); color: white; padding: 12px; font-size: 1.1rem;
-            box-shadow: 0 4px 0 #16a34a; align-self: center; width: 80%;
+        /* Efeito Hover solicitado */
+        .btn-verify:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 0 #16a34a;
         }
-        .btn-check:hover { filter: brightness(1.1); transform: scale(1.02); }
-        .btn-check:active { transform: translateY(3px); box-shadow: 0 1px 0 #16a34a; }
+
+        .btn-verify:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #16a34a;
+        }
 
         .btn-help {
-            background: #e2e8f0; color: #475569; padding: 6px 15px; font-size: 0.8rem;
-            width: fit-content; align-self: center;
+            background: transparent;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+            padding: 6px 15px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
         }
-        .btn-help.active { background: var(--min-color); color: white; }
+        .btn-help.active { background: var(--min-color); color: white; border-color: var(--min-color); }
 
-        .feedback { margin-top: 10px; font-weight: 700; min-height: 22px; }
+        #feedback { margin-top: 10px; height: 20px; font-weight: 700; }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        .wrong { animation: shake 0.4s; border-color: #ef4444 !important; }
-
-        footer { margin-top: 20px; font-size: 0.75rem; color: #94a3b8; }
+        footer { margin-top: 20px; font-size: 0.8rem; color: #94a3b8; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div class="container" id="mainContainer">
+<div class="main-card" id="appCard">
     <h1>Vamos aprender a Hora!</h1>
 
-    <div class="info-bar">
-        <span class="info-h">🔵 Ponteiro pequeno: HORAS</span>
-        <span class="info-m">💗 Ponteiro grande: MINUTOS</span>
+    <div class="legend-grid">
+        <div class="sq-card sq-h">PONTEIRO AZUL<br>HORAS</div>
+        <div class="sq-card sq-m">PONTEIRO ROSA<br>MINUTOS</div>
     </div>
 
-    <div class="target-box">
-        <div class="target-label">Ajuste o relógio para:</div>
-        <div class="target-time" id="targetTime">--:--</div>
+    <div class="challenge-card">
+        <div class="label">Ajuste o relógio para:</div>
+        <div class="time-display" id="targetTime">--:--</div>
     </div>
 
-    <div class="clock" id="clock">
-        <div class="center"></div>
+    <div class="clock-face" id="clockFace">
+        <div class="center-pin"></div>
         <div id="hourHand" class="hand hour-hand"></div>
         <div id="minHand" class="hand min-hand"></div>
     </div>
 
-    <div class="controls">
-        <button class="btn-check" onclick="verifyAnswer()">VERIFICAR RESPOSTA</button>
-        <button class="btn-help" id="helpToggle" onclick="toggleHelp()">Ativar Ajuda</button>
-    </div>
+    <button class="btn-verify" onclick="check()">VERIFICAR RESPOSTA</button>
+    <button class="btn-help" id="helpBtn" onclick="toggleHelp()">Ativar Ajuda</button>
 
-    <div id="feedback" class="feedback"></div>
-    
+    <div id="feedback"></div>
+
     <footer>Criado por Fabiano Ferreira</footer>
 </div>
 
 <script>
-    let hRot = 0, mRot = 0, targetH, targetM;
-    const clock = document.getElementById('clock');
-    
-    // Gerar números e ajuda
+    let hRot = 0, mRot = 0, tH, tM;
+    const face = document.getElementById('clockFace');
+
     for (let i = 1; i <= 12; i++) {
         const rad = (i * 30 - 90) * Math.PI / 180;
-        const num = document.createElement('div');
-        num.className = 'number';
-        num.innerText = i;
-        num.style.left = `${115 + 100 * Math.cos(rad)}px`;
-        num.style.top = `${115 + 100 * Math.sin(rad)}px`;
-        clock.appendChild(num);
+        const n = document.createElement('div');
+        n.className = 'number';
+        n.innerText = i;
+        n.style.left = `${115 + 100 * Math.cos(rad)}px`;
+        n.style.top = `${115 + 100 * Math.sin(rad)}px`;
+        face.appendChild(n);
 
-        const help = document.createElement('div');
-        help.className = 'min-help';
-        help.innerText = (i * 5 === 60 ? "00" : i * 5);
-        help.style.left = `${122 + 75 * Math.cos(rad)}px`;
-        help.style.top = `${122 + 75 * Math.sin(rad)}px`;
-        clock.appendChild(help);
+        const h = document.createElement('div');
+        h.className = 'min-help';
+        h.innerText = (i * 5 === 60 ? "00" : i * 5);
+        h.style.left = `${122 + 75 * Math.cos(rad)}px`;
+        h.style.top = `${122 + 75 * Math.sin(rad)}px`;
+        face.appendChild(h);
     }
 
     function toggleHelp() {
-        const container = document.getElementById('mainContainer');
-        const btn = document.getElementById('helpToggle');
-        const isActive = container.classList.toggle('show-help');
-        btn.innerText = isActive ? "Desativar Ajuda" : "Ativar Ajuda";
-        btn.classList.toggle('active', isActive);
+        const active = face.classList.toggle('show-help');
+        const btn = document.getElementById('helpBtn');
+        btn.innerText = active ? "Desativar Ajuda" : "Ativar Ajuda";
+        btn.classList.toggle('active', active);
     }
 
-    function setupDraggable(element, isHour) {
-        let isDragging = false;
-
-        const handleStart = (e) => {
-            isDragging = true;
-            e.preventDefault();
-        };
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            const rect = clock.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const cy = rect.top + rect.height / 2;
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            let deg = Math.atan2(clientY - cy, clientX - cx) * 180 / Math.PI + 90;
+    function setupDrag(el, isH) {
+        let dragging = false;
+        const onStart = (e) => { dragging = true; e.preventDefault(); };
+        const onMove = (e) => {
+            if (!dragging) return;
+            const r = face.getBoundingClientRect();
+            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+            const tx = e.touches ? e.touches[0].clientX : e.clientX;
+            const ty = e.touches ? e.touches[0].clientY : e.clientY;
+            let deg = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
             if (deg < 0) deg += 360;
-
-            const snap = isHour ? 30 : 6;
+            const snap = isH ? 30 : 6;
             const snapped = Math.round(deg / snap) * snap;
-
-            element.style.transform = `translateX(-50%) rotate(${snapped}deg)`;
-            if (isHour) hRot = snapped; else mRot = snapped;
+            el.style.transform = `translateX(-50%) rotate(${snapped}deg)`;
+            if (isH) hRot = snapped; else mRot = snapped;
         };
-
-        const handleEnd = () => isDragging = false;
-
-        element.addEventListener('mousedown', handleStart);
-        element.addEventListener('touchstart', handleStart);
-        window.addEventListener('mousemove', handleMove);
-        window.addEventListener('touchmove', handleMove);
-        window.addEventListener('mouseup', handleEnd);
-        window.addEventListener('touchend', handleEnd);
+        const onEnd = () => dragging = false;
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('touchstart', onStart);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('mouseup', onEnd);
+        window.addEventListener('touchend', onEnd);
     }
 
-    setupDraggable(document.getElementById('hourHand'), true);
-    setupDraggable(document.getElementById('minHand'), false);
+    setupDrag(document.getElementById('hourHand'), true);
+    setupDrag(document.getElementById('minHand'), false);
 
-    function verifyAnswer() {
-        const container = document.getElementById('mainContainer');
+    function check() {
+        const fb = document.getElementById('feedback');
         let curH = (Math.round(hRot / 30) % 12) || 12;
         let curM = (Math.round(mRot / 6) % 60);
 
-        if (curH === targetH && curM === targetM) {
-            document.getElementById('feedback').innerText = "VOCÊ É UM GÊNIO! 🌟";
-            document.getElementById('feedback').style.color = "#22c55e";
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.7 } });
-            setTimeout(newChallenge, 4000);
+        if (curH === tH && curM === tM) {
+            fb.innerText = "VOCÊ É DEMAIS! ✨";
+            fb.style.color = "#22c55e";
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.7 } });
+            setTimeout(reset, 3000);
         } else {
-            container.classList.add('wrong');
-            document.getElementById('feedback').innerText = "Quase lá, tente outra vez!";
-            document.getElementById('feedback').style.color = "#ef4444";
-            setTimeout(() => container.classList.remove('wrong'), 500);
+            fb.innerText = "Ops! Tente novamente.";
+            fb.style.color = "#f43f5e";
         }
     }
 
-    function newChallenge() {
-        targetH = Math.floor(Math.random() * 12) || 12;
-        targetM = [0, 15, 30, 45, 10, 50][Math.floor(Math.random() * 6)];
-        document.getElementById('targetTime').innerText = 
-            `${targetH.toString().padStart(2,'0')}:${targetM.toString().padStart(2,'0')}`;
+    function reset() {
+        tH = Math.floor(Math.random() * 12) || 12;
+        tM = [0, 15, 30, 45, 10, 50, 20][Math.floor(Math.random() * 7)];
+        document.getElementById('targetTime').innerText = `${tH.toString().padStart(2,'0')}:${tM.toString().padStart(2,'0')}`;
         document.getElementById('feedback').innerText = "";
     }
-
-    newChallenge();
+    reset();
 </script>
 </body>
 </html>
