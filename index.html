@@ -3,226 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vamos aprender a Hora!</title>
+    <title>Vamos Aprender as Horas?</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --hour-color: #3b82f6; /* Azul */
-            --min-color: #f43f5e;  /* Rosa */
-            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #fef2f2 100%);
+            --bg: #e0e5ec;
+            --hour-blue: #3b82f6;
+            --min-pink: #f43f5e;
+            --shadow-light: #ffffff;
+            --shadow-dark: #a3b1c6;
+            --glow-color: transparent;
         }
 
         body {
             font-family: 'Fredoka', sans-serif;
-            background: var(--bg-gradient);
+            background-color: var(--bg);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            padding: 10px;
-            user-select: none;
+            color: #444;
         }
 
-        .main-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
+        .container {
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
             border-radius: 40px;
-            padding: 1.5rem;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1);
+            background: var(--bg);
+            box-shadow: 20px 20px 60px var(--shadow-dark), -20px -20px 60px var(--shadow-light);
             text-align: center;
-            width: 100%;
-            max-width: 380px;
-            border: 1px solid rgba(255,255,255,0.6);
         }
 
-        h1 { color: #1e293b; margin: 0 0 15px 0; font-size: 1.6rem; }
+        /* Avatar com Brilho Dinâmico */
+        .avatar-box {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            border: 5px solid white;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 25px var(--glow-color), 10px 10px 20px var(--shadow-dark);
+            transition: box-shadow 0.4s ease, transform 0.3s ease;
+        }
 
-        /* Cards de Legenda Simplificados */
+        #personagemImg { width: 100%; height: 100%; object-fit: cover; }
+
+        h1 { font-size: 1.4rem; margin-bottom: 20px; color: #31344b; }
+
         .legend-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-bottom: 20px;
         }
 
         .sq-card {
-            padding: 10px;
-            border-radius: 15px;
-            font-weight: 700;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-            line-height: 1.2;
+            padding: 12px; border-radius: 15px; font-weight: 700; font-size: 0.7rem;
+            background: var(--bg); box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+        }
+        .text-blue { color: var(--hour-blue); }
+        .text-pink { color: var(--min-pink); }
+
+        .display-screen {
+            background: var(--bg); padding: 15px; border-radius: 25px;
+            box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+            margin-bottom: 25px;
+        }
+        .time-value { font-size: 2.5rem; font-weight: 700; color: #31344b; }
+
+        .clock-outer {
+            width: 260px; height: 260px; border-radius: 50%;
+            background: var(--bg); box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
+            margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;
         }
 
-        .sq-h { background: #eff6ff; color: var(--hour-color); }
-        .sq-m { background: #fff1f2; color: var(--min-color); }
-
-        .challenge-card {
-            background: white;
-            border-radius: 20px;
-            padding: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        .clock-inner {
+            width: 230px; height: 230px; border-radius: 50%;
+            background: var(--bg); box-shadow: inset 8px 8px 16px var(--shadow-dark), inset -8px -8px 16px var(--shadow-light);
+            position: relative; touch-action: none;
         }
 
-        .label { color: #64748b; font-size: 0.85rem; font-weight: 600; }
-        .time-display { font-size: 2.8rem; font-weight: 700; color: #1e293b; line-height: 1; }
-
-        .clock-face {
-            position: relative;
-            width: 260px;
-            height: 260px;
-            margin: 0 auto 20px;
-            background: #ffffff;
-            border-radius: 50%;
-            border: 10px solid #ffffff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            touch-action: none;
-        }
-
-        .number {
-            position: absolute; width: 30px; height: 30px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 1.4rem; color: #334155;
-            pointer-events: none; z-index: 1;
-        }
-
-        .min-help {
-            position: absolute; font-size: 0.85rem; color: var(--min-color);
-            font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none;
-        }
-        .show-help .min-help { opacity: 1; }
-
-        .hand {
-            position: absolute; bottom: 50%; left: 50%;
-            transform-origin: bottom center; border-radius: 20px;
-            cursor: pointer;
-        }
+        .number { position: absolute; font-weight: 700; font-size: 1.1rem; color: #4a4d6d; pointer-events: none; }
         
-        .hour-hand { width: 14px; height: 65px; background: var(--hour-color); z-index: 50; }
-        .min-hand { width: 8px; height: 100px; background: var(--min-color); z-index: 40; }
+        .min-number {
+            position: absolute; font-weight: 700; font-size: 0.75rem; color: var(--min-pink);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .show-dica .min-number { opacity: 1; }
 
-        .center-pin {
-            position: absolute; top: 50%; left: 50%; width: 18px; height: 18px;
-            background: #1e293b; border-radius: 50%; transform: translate(-50%, -50%);
-            z-index: 100; border: 3px solid white;
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 10px; cursor: pointer; }
+        .hour-hand { width: 10px; height: 55px; background: var(--hour-blue); z-index: 50; }
+        .min-hand { width: 6px; height: 85px; background: var(--min-pink); z-index: 40; }
+
+        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
+        .btn {
+            border: none; border-radius: 15px; font-family: 'Fredoka', sans-serif;
+            font-weight: 700; cursor: pointer; background: var(--bg);
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+            transition: 0.2s;
+        }
+        .btn-check { padding: 15px; flex: 2; color: #28a745; }
+        
+        .btn-help { padding: 15px; flex: 1; color: #777; font-size: 0.8rem; animation: pulse 2s infinite; }
+        .btn-help.active { box-shadow: inset 2px 2px 5px var(--shadow-dark); color: var(--min-pink); animation: none; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
-        /* Botão Verificar Resposta Ajustado */
-        .btn-verify {
-            background: #22c55e;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 18px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #16a34a;
-            width: fit-content; /* Tamanho ajustado ao texto */
-            align-self: center;
-            margin: 0 auto 10px;
-            display: block;
-            transition: all 0.2s ease;
-            font-family: 'Fredoka', sans-serif;
-        }
+        .btn:active { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); transform: scale(0.98); }
 
-        /* Efeito Hover solicitado */
-        .btn-verify:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
-            box-shadow: 0 6px 0 #16a34a;
-        }
-
-        .btn-verify:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #16a34a;
-        }
-
-        .btn-help {
-            background: transparent;
-            color: #64748b;
-            border: 2px solid #e2e8f0;
-            padding: 6px 15px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            cursor: pointer;
-        }
-        .btn-help.active { background: var(--min-color); color: white; border-color: var(--min-color); }
-
-        #feedback { margin-top: 10px; height: 20px; font-weight: 700; }
-
-        footer { margin-top: 20px; font-size: 0.8rem; color: #94a3b8; font-weight: 700; }
+        #feedback { height: 20px; margin-top: 15px; font-weight: 700; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="main-card" id="appCard">
-    <h1>Vamos aprender a Hora!</h1>
+<div class="container">
+    <div class="avatar-box" id="avatarBox">
+        <img id="personagemImg" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png" alt="Personagem">
+    </div>
+
+    <h1>Vamos Aprender as Horas?</h1>
 
     <div class="legend-grid">
-        <div class="sq-card sq-h">PONTEIRO AZUL<br>HORAS</div>
-        <div class="sq-card sq-m">PONTEIRO ROSA<br>MINUTOS</div>
+        <div class="sq-card text-blue">PONTEIRO AZUL<br>HORAS</div>
+        <div class="sq-card text-pink">PONTEIRO ROSA<br>MINUTOS</div>
     </div>
 
-    <div class="challenge-card">
-        <div class="label">Ajuste o relógio para:</div>
-        <div class="time-display" id="targetTime">--:--</div>
+    <div class="display-screen">
+        <div class="time-value" id="targetTime">--:--</div>
     </div>
 
-    <div class="clock-face" id="clockFace">
-        <div class="center-pin"></div>
-        <div id="hourHand" class="hand hour-hand"></div>
-        <div id="minHand" class="hand min-hand"></div>
+    <div class="clock-outer">
+        <div class="clock-inner" id="clockFace">
+            <div id="hourHand" class="hand hour-hand"></div>
+            <div id="minHand" class="hand min-hand"></div>
+        </div>
     </div>
 
-    <button class="btn-verify" onclick="check()">VERIFICAR RESPOSTA</button>
-    <button class="btn-help" id="helpBtn" onclick="toggleHelp()">Ativar Ajuda</button>
+    <div class="btn-group">
+        <button class="btn btn-check" onclick="check()">VERIFICAR</button>
+        <button id="btnHelp" class="btn btn-help" onclick="toggleHelp()">DICA</button>
+    </div>
 
     <div id="feedback"></div>
 
-    <footer>Criado por Fabiano Ferreira</footer>
+    <div style="margin-top: 20px; font-size: 0.7rem; color: #999; font-weight: 700;">
+        CRIADO POR FABIANO FERREIRA
+    </div>
 </div>
 
 <script>
+    const FOTO_FELIZ = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png";
+    const FOTO_TRISTE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/84f917126_Designsemnome4.png";
+
     let hRot = 0, mRot = 0, tH, tM;
+    const imgElement = document.getElementById('personagemImg');
+    const avatarBox = document.getElementById('avatarBox');
     const face = document.getElementById('clockFace');
 
     for (let i = 1; i <= 12; i++) {
         const rad = (i * 30 - 90) * Math.PI / 180;
         const n = document.createElement('div');
-        n.className = 'number';
-        n.innerText = i;
-        n.style.left = `${115 + 100 * Math.cos(rad)}px`;
-        n.style.top = `${115 + 100 * Math.sin(rad)}px`;
+        n.className = 'number'; n.innerText = i;
+        n.style.left = `${108 + 85 * Math.cos(rad)}px`;
+        n.style.top = `${105 + 85 * Math.sin(rad)}px`;
         face.appendChild(n);
 
-        const h = document.createElement('div');
-        h.className = 'min-help';
-        h.innerText = (i * 5 === 60 ? "00" : i * 5);
-        h.style.left = `${122 + 75 * Math.cos(rad)}px`;
-        h.style.top = `${122 + 75 * Math.sin(rad)}px`;
-        face.appendChild(h);
+        const m = document.createElement('div');
+        m.className = 'min-number';
+        m.innerText = (i * 5 === 60 ? "00" : i * 5);
+        m.style.left = `${110 + 60 * Math.cos(rad)}px`;
+        m.style.top = `${110 + 60 * Math.sin(rad)}px`;
+        face.appendChild(m);
     }
 
     function toggleHelp() {
-        const active = face.classList.toggle('show-help');
-        const btn = document.getElementById('helpBtn');
-        btn.innerText = active ? "Desativar Ajuda" : "Ativar Ajuda";
-        btn.classList.toggle('active', active);
+        const active = face.classList.toggle('show-dica');
+        document.getElementById('btnHelp').classList.toggle('active', active);
     }
 
     function setupDrag(el, isH) {
         let dragging = false;
-        const onStart = (e) => { dragging = true; e.preventDefault(); };
-        const onMove = (e) => {
+        const move = (e) => {
             if (!dragging) return;
             const r = face.getBoundingClientRect();
             const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
@@ -234,14 +202,14 @@
             const snapped = Math.round(deg / snap) * snap;
             el.style.transform = `translateX(-50%) rotate(${snapped}deg)`;
             if (isH) hRot = snapped; else mRot = snapped;
+            avatarBox.style.setProperty('--glow-color', 'transparent');
         };
-        const onEnd = () => dragging = false;
-        el.addEventListener('mousedown', onStart);
-        el.addEventListener('touchstart', onStart);
-        window.addEventListener('mousemove', onMove);
-        window.addEventListener('touchmove', onMove, { passive: false });
-        window.addEventListener('mouseup', onEnd);
-        window.addEventListener('touchend', onEnd);
+        el.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
+        el.addEventListener('touchstart', (e) => { dragging = true; e.preventDefault(); });
+        window.addEventListener('mousemove', move);
+        window.addEventListener('touchmove', move, { passive: false });
+        window.addEventListener('mouseup', () => dragging = false);
+        window.addEventListener('touchend', () => dragging = false);
     }
 
     setupDrag(document.getElementById('hourHand'), true);
@@ -253,17 +221,23 @@
         let curM = (Math.round(mRot / 6) % 60);
 
         if (curH === tH && curM === tM) {
+            imgElement.src = FOTO_FELIZ;
+            avatarBox.style.setProperty('--glow-color', '#28a745');
             fb.innerText = "VOCÊ É DEMAIS! ✨";
-            fb.style.color = "#22c55e";
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.7 } });
+            fb.style.color = "#28a745";
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 } });
             setTimeout(reset, 3000);
         } else {
-            fb.innerText = "Ops! Tente novamente.";
+            imgElement.src = FOTO_TRISTE;
+            avatarBox.style.setProperty('--glow-color', '#f43f5e');
+            fb.innerText = "Quase! Vamos tentar de novo?";
             fb.style.color = "#f43f5e";
         }
     }
 
     function reset() {
+        avatarBox.style.setProperty('--glow-color', 'transparent');
+        imgElement.src = FOTO_FELIZ;
         tH = Math.floor(Math.random() * 12) || 12;
         tM = [0, 15, 30, 45, 10, 50, 20][Math.floor(Math.random() * 7)];
         document.getElementById('targetTime').innerText = `${tH.toString().padStart(2,'0')}:${tM.toString().padStart(2,'0')}`;
