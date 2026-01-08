@@ -2,248 +2,204 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vamos Aprender as Horas?</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        :root {
-            --bg: #e0e5ec;
-            --hour-blue: #3b82f6;
-            --min-pink: #f43f5e;
-            --shadow-light: #ffffff;
-            --shadow-dark: #a3b1c6;
-            --glow-color: transparent;
+        body { font-family: 'Fredoka', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         }
-
-        body {
-            font-family: 'Fredoka', sans-serif;
-            background-color: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #444;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 400px;
-            padding: 25px;
-            border-radius: 40px;
-            background: var(--bg);
-            box-shadow: 20px 20px 60px var(--shadow-dark), -20px -20px 60px var(--shadow-light);
-            text-align: center;
-        }
-
-        /* Avatar com Brilho Dinâmico */
-        .avatar-box {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            border: 5px solid white;
-            overflow: hidden;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 0 25px var(--glow-color), 10px 10px 20px var(--shadow-dark);
-            transition: box-shadow 0.4s ease, transform 0.3s ease;
-        }
-
-        #personagemImg { width: 100%; height: 100%; object-fit: cover; }
-
-        h1 { font-size: 1.4rem; margin-bottom: 20px; color: #31344b; }
-
-        .legend-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 15px; margin-bottom: 20px;
-        }
-
-        .sq-card {
-            padding: 12px; border-radius: 15px; font-weight: 700; font-size: 0.7rem;
-            background: var(--bg); box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-        }
-        .text-blue { color: var(--hour-blue); }
-        .text-pink { color: var(--min-pink); }
-
-        .display-screen {
-            background: var(--bg); padding: 15px; border-radius: 25px;
-            box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
-            margin-bottom: 25px;
-        }
-        .time-value { font-size: 2.5rem; font-weight: 700; color: #31344b; }
-
-        .clock-outer {
-            width: 260px; height: 260px; border-radius: 50%;
-            background: var(--bg); box-shadow: 10px 10px 20px var(--shadow-dark), -10px -10px 20px var(--shadow-light);
-            margin: 0 auto 25px; display: flex; align-items: center; justify-content: center;
-        }
-
-        .clock-inner {
-            width: 230px; height: 230px; border-radius: 50%;
-            background: var(--bg); box-shadow: inset 8px 8px 16px var(--shadow-dark), inset -8px -8px 16px var(--shadow-light);
-            position: relative; touch-action: none;
-        }
-
-        .number { position: absolute; font-weight: 700; font-size: 1.1rem; color: #4a4d6d; pointer-events: none; }
+        .clock-face { touch-action: none; }
+        .hand { transform-origin: bottom center; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .number-node { transform: translate(-50%, -50%); position: absolute; }
         
-        .min-number {
-            position: absolute; font-weight: 700; font-size: 0.75rem; color: var(--min-pink);
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        /* Efeito de Brilho (Glow) */
+        .glow-effect { transition: all 0.4s ease; box-shadow: 0 0 0px transparent; }
+        .glow-success { box-shadow: 0 0 35px #22c55e; border-color: #22c55e !important; transform: scale(1.05); }
+        .glow-error { box-shadow: 0 0 35px #ef4444; border-color: #ef4444 !important; transform: scale(0.95); }
+
+        @keyframes pulse-orange {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7); }
+            70% { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(251, 146, 60, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); }
         }
-        .show-dica .min-number { opacity: 1; }
+        .animate-pulse-button { animation: pulse-orange 2s infinite; }
 
-        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; border-radius: 10px; cursor: pointer; }
-        .hour-hand { width: 10px; height: 55px; background: var(--hour-blue); z-index: 50; }
-        .min-hand { width: 6px; height: 85px; background: var(--min-pink); z-index: 40; }
+        /* Tamanhos Otimizados e Proporcionais */
+        .avatar-size { width: 130px; height: 130px; }
+        .clock-size { width: 260px; height: 260px; }
 
-        .btn-group { display: flex; gap: 12px; margin-top: 20px; }
-        .btn {
-            border: none; border-radius: 15px; font-family: 'Fredoka', sans-serif;
-            font-weight: 700; cursor: pointer; background: var(--bg);
-            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-            transition: 0.2s;
-        }
-        .btn-check { padding: 15px; flex: 2; color: #28a745; }
-        
-        .btn-help { padding: 15px; flex: 1; color: #777; font-size: 0.8rem; animation: pulse 2s infinite; }
-        .btn-help.active { box-shadow: inset 2px 2px 5px var(--shadow-dark); color: var(--min-pink); animation: none; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @media (max-width: 380px) {
+            .avatar-size { width: 110px; height: 110px; }
+            .clock-size { width: 240px; height: 240px; }
         }
 
-        .btn:active { box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light); transform: scale(0.98); }
-
-        #feedback { height: 20px; margin-top: 15px; font-weight: 700; font-size: 0.9rem; }
+        @media (max-height: 700px) {
+            .avatar-size { width: 100px; height: 100px; }
+            .clock-size { width: 220px; height: 220px; }
+            h1 { font-size: 1.1rem !important; }
+        }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-2 bg-gradient-custom">
 
-<div class="container">
-    <div class="avatar-box" id="avatarBox">
-        <img id="personagemImg" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png" alt="Personagem">
-    </div>
+    <div class="w-full max-w-sm p-5 rounded-[40px] text-center bg-white shadow-2xl">
+        
+        <h1 class="text-xl font-black mb-3 whitespace-nowrap overflow-hidden">
+            <span class="text-blue-500">Vamos</span> 
+            <span class="text-orange-400">Aprender</span>
+            <span class="text-pink-500">as Horas?</span>
+        </h1>
 
-    <h1>Vamos Aprender as Horas?</h1>
+        <div class="mb-4 relative inline-block">
+            <img id="avatar" src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png" 
+                 class="glow-effect avatar-size mx-auto rounded-full object-cover border-4 border-white shadow-lg">
+            
+            <div id="streak-container" class="hidden absolute top-0 -right-2 bg-orange-500 text-white text-[10px] px-2 py-1 rounded-full font-bold shadow-lg flex items-center gap-1">
+                <i data-lucide="flame" class="w-3 h-3"></i> <span id="streak-text">0</span>
+            </div>
+        </div>
 
-    <div class="legend-grid">
-        <div class="sq-card text-blue">PONTEIRO AZUL<br>HORAS</div>
-        <div class="sq-card text-pink">PONTEIRO ROSA<br>MINUTOS</div>
-    </div>
+        <div class="flex justify-center gap-3 mb-4">
+            <div class="px-2 py-1 rounded-lg bg-blue-50 border border-blue-200 text-[8px] font-black text-blue-500 uppercase tracking-tighter">Ponteiro Azul: Horas</div>
+            <div class="px-2 py-1 rounded-lg bg-pink-50 border border-pink-200 text-[8px] font-black text-pink-500 uppercase tracking-tighter">Ponteiro Rosa: Minutos</div>
+        </div>
 
-    <div class="display-screen">
-        <div class="time-value" id="targetTime">--:--</div>
-    </div>
+        <div class="py-2 px-4 rounded-3xl mb-4 bg-purple-50 border border-purple-100">
+            <p class="text-[9px] font-bold text-purple-400 uppercase tracking-tight">Coloque o relógio em:</p>
+            <div id="target-time" class="text-3xl font-black text-purple-600">12:00</div>
+        </div>
 
-    <div class="clock-outer">
-        <div class="clock-inner" id="clockFace">
-            <div id="hourHand" class="hand hour-hand"></div>
-            <div id="minHand" class="hand min-hand"></div>
+        <div class="clock-size mx-auto rounded-full flex items-center justify-center mb-6 bg-gradient-to-br from-orange-300 to-orange-400 shadow-xl p-2">
+            <div id="clock-face" class="w-full h-full rounded-full relative bg-white shadow-inner clock-face">
+                <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-slate-700 rounded-full z-50 -translate-x-1/2 -translate-y-1/2 border-2 border-white shadow-md"></div>
+                
+                <div id="min-hand" class="hand absolute left-1/2 bottom-1/2 w-1.5 h-[42%] bg-pink-500 rounded-full z-40 -translate-x-1/2 cursor-pointer shadow-sm"></div>
+                
+                <div id="hour-hand" class="hand absolute left-1/2 bottom-1/2 w-2.5 h-[30%] bg-blue-500 rounded-full z-50 -translate-x-1/2 cursor-pointer shadow-sm"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-4 px-6">
+            <button onclick="checkAnswer()" class="flex-1 py-3.5 bg-green-500 text-white rounded-2xl font-black shadow-md active:scale-95 transition-all text-[11px] uppercase">
+                Verificar
+            </button>
+            <button id="btn-help" onclick="toggleHelper()" class="animate-pulse-button flex-1 py-3.5 bg-orange-400 text-white rounded-2xl font-black shadow-md active:scale-95 transition-all text-[11px] uppercase">
+                Dica
+            </button>
+        </div>
+
+        <div id="feedback" class="mt-3 font-bold text-xs min-h-[16px]"></div>
+
+        <div class="mt-4 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+            Criado por Fabiano Ferreira
         </div>
     </div>
 
-    <div class="btn-group">
-        <button class="btn btn-check" onclick="check()">VERIFICAR</button>
-        <button id="btnHelp" class="btn btn-help" onclick="toggleHelp()">DICA</button>
-    </div>
+    <script>
+        lucide.createIcons();
+        const colors = ['#10b981', '#ef4444', '#ec4899', '#f43f5e', '#06b6d4', '#8b5cf6', '#6366f1', '#eab308', '#f97316', '#22c55e', '#3b82f6', '#a855f7'];
+        const face = document.getElementById('clock-face');
+        const av = document.getElementById('avatar');
+        let hRot = 0, mRot = 0, tH, tM, streak = 0, showHelper = false;
 
-    <div id="feedback"></div>
+        for (let i = 1; i <= 12; i++) {
+            const rad = (i * 30 - 90) * (Math.PI / 180);
+            const n = document.createElement('div');
+            n.className = 'number-node font-black text-xl';
+            n.innerText = i;
+            n.style.left = (50 + 40 * Math.cos(rad)) + '%';
+            n.style.top = (50 + 40 * Math.sin(rad)) + '%';
+            n.style.color = colors[i % 12];
+            face.appendChild(n);
 
-    <div style="margin-top: 20px; font-size: 0.7rem; color: #999; font-weight: 700;">
-        CRIADO POR FABIANO FERREIRA
-    </div>
-</div>
-
-<script>
-    const FOTO_FELIZ = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png";
-    const FOTO_TRISTE = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/84f917126_Designsemnome4.png";
-
-    let hRot = 0, mRot = 0, tH, tM;
-    const imgElement = document.getElementById('personagemImg');
-    const avatarBox = document.getElementById('avatarBox');
-    const face = document.getElementById('clockFace');
-
-    for (let i = 1; i <= 12; i++) {
-        const rad = (i * 30 - 90) * Math.PI / 180;
-        const n = document.createElement('div');
-        n.className = 'number'; n.innerText = i;
-        n.style.left = `${108 + 85 * Math.cos(rad)}px`;
-        n.style.top = `${105 + 85 * Math.sin(rad)}px`;
-        face.appendChild(n);
-
-        const m = document.createElement('div');
-        m.className = 'min-number';
-        m.innerText = (i * 5 === 60 ? "00" : i * 5);
-        m.style.left = `${110 + 60 * Math.cos(rad)}px`;
-        m.style.top = `${110 + 60 * Math.sin(rad)}px`;
-        face.appendChild(m);
-    }
-
-    function toggleHelp() {
-        const active = face.classList.toggle('show-dica');
-        document.getElementById('btnHelp').classList.toggle('active', active);
-    }
-
-    function setupDrag(el, isH) {
-        let dragging = false;
-        const move = (e) => {
-            if (!dragging) return;
-            const r = face.getBoundingClientRect();
-            const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            const tx = e.touches ? e.touches[0].clientX : e.clientX;
-            const ty = e.touches ? e.touches[0].clientY : e.clientY;
-            let deg = Math.atan2(ty - cy, tx - cx) * 180 / Math.PI + 90;
-            if (deg < 0) deg += 360;
-            const snap = isH ? 30 : 6;
-            const snapped = Math.round(deg / snap) * snap;
-            el.style.transform = `translateX(-50%) rotate(${snapped}deg)`;
-            if (isH) hRot = snapped; else mRot = snapped;
-            avatarBox.style.setProperty('--glow-color', 'transparent');
-        };
-        el.addEventListener('mousedown', (e) => { dragging = true; e.preventDefault(); });
-        el.addEventListener('touchstart', (e) => { dragging = true; e.preventDefault(); });
-        window.addEventListener('mousemove', move);
-        window.addEventListener('touchmove', move, { passive: false });
-        window.addEventListener('mouseup', () => dragging = false);
-        window.addEventListener('touchend', () => dragging = false);
-    }
-
-    setupDrag(document.getElementById('hourHand'), true);
-    setupDrag(document.getElementById('minHand'), false);
-
-    function check() {
-        const fb = document.getElementById('feedback');
-        let curH = (Math.round(hRot / 30) % 12) || 12;
-        let curM = (Math.round(mRot / 6) % 60);
-
-        if (curH === tH && curM === tM) {
-            imgElement.src = FOTO_FELIZ;
-            avatarBox.style.setProperty('--glow-color', '#28a745');
-            fb.innerText = "VOCÊ É DEMAIS! ✨";
-            fb.style.color = "#28a745";
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.8 } });
-            setTimeout(reset, 3000);
-        } else {
-            imgElement.src = FOTO_TRISTE;
-            avatarBox.style.setProperty('--glow-color', '#f43f5e');
-            fb.innerText = "Quase! Vamos tentar de novo?";
-            fb.style.color = "#f43f5e";
+            const mh = document.createElement('div');
+            mh.className = 'min-node absolute font-black text-[9px] text-pink-400 hidden';
+            mh.innerText = (i * 5 === 60 ? '00' : String(i * 5).padStart(2, '0'));
+            mh.style.left = (50 + 26 * Math.cos(rad)) + '%';
+            mh.style.top = (50 + 26 * Math.sin(rad)) + '%';
+            mh.style.transform = 'translate(-50%, -50%)';
+            face.appendChild(mh);
         }
-    }
 
-    function reset() {
-        avatarBox.style.setProperty('--glow-color', 'transparent');
-        imgElement.src = FOTO_FELIZ;
-        tH = Math.floor(Math.random() * 12) || 12;
-        tM = [0, 15, 30, 45, 10, 50, 20][Math.floor(Math.random() * 7)];
-        document.getElementById('targetTime').innerText = `${tH.toString().padStart(2,'0')}:${tM.toString().padStart(2,'0')}`;
-        document.getElementById('feedback').innerText = "";
-    }
-    reset();
-</script>
+        function toggleHelper() {
+            showHelper = !showHelper;
+            document.querySelectorAll('.min-node').forEach(el => el.classList.toggle('hidden', !showHelper));
+            document.getElementById('btn-help').classList.toggle('animate-pulse-button', !showHelper);
+        }
+
+        function handleDrag(el, type) {
+            let isDragging = false;
+            const update = (e) => {
+                if (!isDragging) return;
+                const rect = face.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                let deg = Math.atan2(clientY - centerY, clientX - centerX) * 180 / Math.PI + 90;
+                if (deg < 0) deg += 360;
+                const snap = type === 'hour' ? 30 : 6;
+                const snapped = Math.round(deg / snap) * snap;
+                el.style.transform = `translateX(-50%) rotate(${snapped}deg)`;
+                if (type === 'hour') hRot = snapped; else mRot = snapped;
+                av.classList.remove('glow-success', 'glow-error');
+            };
+            el.addEventListener('mousedown', () => isDragging = true);
+            el.addEventListener('touchstart', (e) => { isDragging = true; });
+            window.addEventListener('mousemove', update);
+            window.addEventListener('touchmove', update, { passive: false });
+            window.addEventListener('mouseup', () => isDragging = false);
+            window.addEventListener('touchend', () => isDragging = false);
+        }
+
+        handleDrag(document.getElementById('hour-hand'), 'hour');
+        handleDrag(document.getElementById('min-hand'), 'min');
+
+        function checkAnswer() {
+            const curH = (Math.round(hRot / 30) % 12) || 12;
+            const curM = (Math.round(mRot / 6) % 60);
+            const fb = document.getElementById('feedback');
+
+            if (curH === tH && curM === tM) {
+                streak++;
+                fb.innerText = "🌟 VOCÊ CONSEGUIU!";
+                fb.className = "mt-2 font-bold text-xs text-green-500 uppercase";
+                av.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/24b729725_Designsemnome3.png";
+                av.classList.add('glow-success');
+                confetti({ particleCount: 150, spread: 60, origin: { y: 0.8 } });
+                updateStreak();
+                setTimeout(nextQuestion, 2000);
+            } else {
+                streak = 0;
+                fb.innerText = "💪 TENTE MAIS UMA VEZ!";
+                fb.className = "mt-2 font-bold text-xs text-pink-500 uppercase";
+                av.src = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695fbcffde1adc390e805e93/84f917126_Designsemnome4.png";
+                av.classList.add('glow-error');
+                updateStreak();
+            }
+        }
+
+        function updateStreak() {
+            const container = document.getElementById('streak-container');
+            document.getElementById('streak-text').innerText = streak;
+            container.classList.toggle('hidden', streak === 0);
+        }
+
+        function nextQuestion() {
+            tH = Math.floor(Math.random() * 12) || 12;
+            tM = [0, 15, 30, 45, 10, 20, 40, 50][Math.floor(Math.random() * 8)];
+            document.getElementById('target-time').innerText = `${String(tH).padStart(2, '0')}:${String(tM).padStart(2, '0')}`;
+            document.getElementById('feedback').innerText = "";
+            av.classList.remove('glow-success', 'glow-error');
+        }
+        nextQuestion();
+    </script>
 </body>
 </html>
