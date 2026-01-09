@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vamos Aprender as Horas?</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#764ba2">
+    <link rel="apple-touch-icon" href="icone512.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -19,7 +23,6 @@
         .hand { transform-origin: bottom center; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .number-node { transform: translate(-50%, -50%); position: absolute; }
         
-        /* Efeito de Brilho (Glow) */
         .glow-effect { transition: all 0.4s ease; box-shadow: 0 0 0px transparent; }
         .glow-success { box-shadow: 0 0 35px #22c55e; border-color: #22c55e !important; transform: scale(1.05); }
         .glow-error { box-shadow: 0 0 35px #ef4444; border-color: #ef4444 !important; transform: scale(0.95); }
@@ -31,7 +34,6 @@
         }
         .animate-pulse-button { animation: pulse-orange 2s infinite; }
 
-        /* Tamanhos Otimizados e Proporcionais */
         .avatar-size { width: 130px; height: 130px; }
         .clock-size { width: 260px; height: 260px; }
 
@@ -79,9 +81,7 @@
         <div class="clock-size mx-auto rounded-full flex items-center justify-center mb-6 bg-gradient-to-br from-orange-300 to-orange-400 shadow-xl p-2">
             <div id="clock-face" class="w-full h-full rounded-full relative bg-white shadow-inner clock-face">
                 <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-slate-700 rounded-full z-50 -translate-x-1/2 -translate-y-1/2 border-2 border-white shadow-md"></div>
-                
                 <div id="min-hand" class="hand absolute left-1/2 bottom-1/2 w-1.5 h-[42%] bg-pink-500 rounded-full z-40 -translate-x-1/2 cursor-pointer shadow-sm"></div>
-                
                 <div id="hour-hand" class="hand absolute left-1/2 bottom-1/2 w-2.5 h-[30%] bg-blue-500 rounded-full z-50 -translate-x-1/2 cursor-pointer shadow-sm"></div>
             </div>
         </div>
