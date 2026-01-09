@@ -1,0 +1,16 @@
+{
+  "name": "Vamos Aprender as Horas?",
+  "short_name": "HorasClara",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#764ba2",
+  "theme_color": "#764ba2",
+  "icons": [
+    {
+      "src": "icone512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
